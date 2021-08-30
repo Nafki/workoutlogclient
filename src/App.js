@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import React,{useState, useEffect} from "react";
+import Sitebar from "./home/Navbar";
+import Auth from "./auth/Auth";
+import WorkoutIndex from "./workouts/WorkoutIndex";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [sessionToken, setSessionToken] = useState(''); //1
+  
+  useEffect(() => { //2
+    if (localStorage.getItem('token')){
+    setSessionToken(localStorage.getItem('token'));
+    }
+  },[])
+
+const updateToken = (newToken) => { //3
+  localStorage.setItem('token', newToken);
+  setSessionToken(newToken);
+    console.log(sessionToken);
 }
 
+const clearToken = () => {
+  localStorage.clear();
+  setSessionToken('');
+}
+const protectedViews = () => {
+  return (sessionToken === localStorage.getItem('token') ? <WorkoutIndex token={sessionToken}/>
+  : <Auth updateToken={updateToken}/>)
+  }
+  
+
+//render method is down here
+  return (
+    <div>
+      <Sitebar clickLogout={clearToken}/>
+      {protectedViews()} {/*1*/}
+      {/*<Auth updateToken={updateToken} />*/}
+    </div>
+  );
+
+}
 export default App;
